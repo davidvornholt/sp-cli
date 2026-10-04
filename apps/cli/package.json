@@ -1,0 +1,23 @@
+{
+  "name": "@sp-cli/cli",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bun build --compile src/app/cli.ts --outfile dist/sp",
+    "check-types": "tsc --noEmit",
+    "lint": "biome check --error-on-warnings .",
+    "lint:fix": "biome check --write --error-on-warnings .",
+    "test": "bun test",
+    "install:user": "bun run build && bun scripts/install.ts"
+  },
+  "dependencies": {
+    "@effect/platform-bun": "4.0.0",
+    "effect": "4.0.0"
+  },
+  "devDependencies": {
+    "@davidvornholt/typescript-config": "workspace:*",
+    "@types/bun": "^1.4.2",
+    "typescript": "7.0.2"
+  }
+}
