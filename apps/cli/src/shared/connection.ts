@@ -148,7 +148,6 @@ const openTunnel = Effect.fn('openTunnel')(function* (host: string) {
     ChildProcess.make('ssh', [
       ...sshOptions,
       '-o',
-      // biome-ignore lint/security/noSecrets: an ssh option name, not a credential.
       'ExitOnForwardFailure=yes',
       '-N',
       '-T',
