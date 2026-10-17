@@ -35,7 +35,7 @@ Set `SP_HOST` to make that the default. For each command, sp reads the token on 
 
 Run `sp --help` for the commands and `sp <command> --help` for their options. The skill in [`apps/cli/skills/super-productivity`](apps/cli/skills/super-productivity/SKILL.md) tells agents how to use them.
 
-The REST API covers tasks and time tracking. Projects and tags are read-only. The app's separate notes, repeating tasks, and per-day time logs aren't exposed yet.
+The REST API covers tasks, time tracking, and repeating tasks. Projects and tags are read-only. `sp repeats` needs Super Productivity 19.2.0 or newer, and it changes only the schedule, pause state, and overdue handling: a repeat config takes its title, notes, tags, estimate, and time from the task when it is created. The app's separate notes and per-day time logs aren't exposed yet.
 
 ## Develop
 

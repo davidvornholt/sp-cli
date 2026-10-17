@@ -1,15 +1,9 @@
-import { Result, Schema } from 'effect';
+import { Result } from 'effect';
+import { InvalidInput } from '../../shared/errors/errors';
 
 // Turns the human-friendly values the CLI accepts into the fields the Super
 // Productivity API stores: durations in milliseconds, calendar days as
 // YYYY-MM-DD, and points in time as epoch milliseconds.
-
-export class InvalidInput extends Schema.TaggedError<InvalidInput>()(
-  'InvalidInput',
-  {
-    message: Schema.String,
-  },
-) {}
 
 const unitMs = { h: 3_600_000, m: 60_000, s: 1000 } as const;
 const durationPattern =

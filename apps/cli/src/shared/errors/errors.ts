@@ -1,5 +1,11 @@
 import { Schema } from 'effect';
 
+// The command's own arguments are wrong, before anything reaches the app.
+export class InvalidInput extends Schema.TaggedError<InvalidInput>()(
+  'InvalidInput',
+  { message: Schema.String },
+) {}
+
 export class TokenUnavailable extends Schema.TaggedError<TokenUnavailable>()(
   'TokenUnavailable',
   { message: Schema.String },
