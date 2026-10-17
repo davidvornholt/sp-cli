@@ -15,7 +15,8 @@ const appDir = `${import.meta.dir}/..`;
 await Bun.$`mkdir -p ${binDir}`;
 await Bun.$`install -m 755 ${appDir}/dist/sp ${binDir}/.sp.tmp`;
 await Bun.$`mv -f ${binDir}/.sp.tmp ${binDir}/sp`;
-await Bun.$`install -D -m 644 ${appDir}/skills/${skill}/SKILL.md ${skillsDir}/${skill}/SKILL.md`;
+await Bun.$`mkdir -p ${skillsDir}/${skill}`;
+await Bun.$`install -m 644 ${appDir}/skills/${skill}/SKILL.md ${skillsDir}/${skill}/SKILL.md`;
 
 // ~/.agents/skills may be its own git repository; keep the installed skill out
 // of its status.

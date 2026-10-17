@@ -20,8 +20,8 @@ import {
 // than its own address.
 export const apiOrigin = 'http://127.0.0.1:3876';
 const apiAuthority = '127.0.0.1:3876';
-// Relative to $XDG_CONFIG_HOME (or ~/.config): Electron's userData directory
-// for Super Productivity, where the app keeps the API token in a 0600 file.
+// Relative to Electron's appData directory, which differs per OS. The app
+// keeps the API token there in a file only the owner can read.
 const tokenPath = 'superProductivity/local-rest-api-token';
 const tunnelReadyTimeout = '15 seconds';
 
@@ -37,7 +37,7 @@ export class Connection extends Context.Service<
 >()('sp-cli/shared/Connection') {}
 
 export type ConnectionTarget =
-  | { readonly _tag: 'Local' }
+  | { readonly _tag: 'Local'; readonly platform: NodeJS.Platform }
   | { readonly _tag: 'Ssh'; readonly host: string };
 
 const missingTokenMessage = (location: string, detail: string): string =>
@@ -45,42 +45,53 @@ const missingTokenMessage = (location: string, detail: string): string =>
 
 const envToken = Config.option(Config.NonEmptyString('SP_TOKEN'));
 
-const localTokenFile = Effect.gen(function* () {
-  const configHome = yield* Config.option(
-    Config.NonEmptyString('XDG_CONFIG_HOME'),
-  );
-  const home = yield* Config.NonEmptyString('HOME');
-  return `${Option.getOrElse(configHome, () => `${home}/.config`)}/${tokenPath}`;
-});
+// Where the app on this machine writes the API token, following Electron's
+// app.getPath('appData') for the given platform.
+export const localTokenFile = (platform: NodeJS.Platform) =>
+  Effect.gen(function* () {
+    if (platform === 'win32') {
+      const appData = yield* Config.NonEmptyString('APPDATA');
+      return `${appData}/${tokenPath}`;
+    }
+    const home = yield* Config.NonEmptyString('HOME');
+    if (platform === 'darwin') {
+      return `${home}/Library/Application Support/${tokenPath}`;
+    }
+    const configHome = yield* Config.option(
+      Config.NonEmptyString('XDG_CONFIG_HOME'),
+    );
+    return `${Option.getOrElse(configHome, () => `${home}/.config`)}/${tokenPath}`;
+  });
 
-const readLocalToken = Effect.gen(function* () {
-  const fromEnv = yield* envToken;
-  if (Option.isSome(fromEnv)) {
-    return fromEnv.value;
-  }
-  const fs = yield* FileSystem.FileSystem;
-  const path = yield* localTokenFile;
-  const token = yield* fs.readFileString(path).pipe(
-    Effect.mapError(
-      (error) =>
+const readLocalToken = (platform: NodeJS.Platform) =>
+  Effect.gen(function* () {
+    const fromEnv = yield* envToken;
+    if (Option.isSome(fromEnv)) {
+      return fromEnv.value;
+    }
+    const fs = yield* FileSystem.FileSystem;
+    const path = yield* localTokenFile(platform);
+    const token = yield* fs.readFileString(path).pipe(
+      Effect.mapError(
+        (error) =>
+          new TokenUnavailable({
+            message: missingTokenMessage(
+              'this machine',
+              `${path}: ${error.message}`,
+            ),
+          }),
+      ),
+    );
+    return token.trim();
+  }).pipe(
+    Effect.catchTag('ConfigError', (error) =>
+      Effect.fail(
         new TokenUnavailable({
-          message: missingTokenMessage(
-            'this machine',
-            `${path}: ${error.message}`,
-          ),
+          message: missingTokenMessage('this machine', error.message),
         }),
+      ),
     ),
   );
-  return token.trim();
-}).pipe(
-  Effect.catchTag('ConfigError', (error) =>
-    Effect.fail(
-      new TokenUnavailable({
-        message: missingTokenMessage('this machine', error.message),
-      }),
-    ),
-  ),
-);
 
 const collectText = (stream: Stream.Stream<Uint8Array, unknown>) =>
   stream.pipe(
@@ -108,15 +119,21 @@ const runRemote = Effect.fn('runRemote')(function* (
   return { stdout, stderr: stderr.trim(), exitCode: Number(exitCode) };
 }, Effect.scoped);
 
+// The remote OS is unknown, so try the Linux location first and fall back to
+// the macOS one. A missing token still reports the Linux path.
+export const remoteTokenCommand = [
+  `f="\${XDG_CONFIG_HOME:-$HOME/.config}/${tokenPath}"`,
+  `m="$HOME/Library/Application Support/${tokenPath}"`,
+  'if [ ! -e "$f" ] && [ -e "$m" ]; then f="$m"; fi',
+  'cat "$f"',
+].join('; ');
+
 const readRemoteToken = Effect.fn('readRemoteToken')(function* (host: string) {
   const fromEnv = yield* envToken;
   if (Option.isSome(fromEnv)) {
     return fromEnv.value;
   }
-  const result = yield* runRemote(
-    host,
-    `cat "\${XDG_CONFIG_HOME:-$HOME/.config}/${tokenPath}"`,
-  ).pipe(
+  const result = yield* runRemote(host, remoteTokenCommand).pipe(
     Effect.mapError(
       (error) =>
         new SshTunnelFailed({
@@ -193,8 +210,8 @@ const openTunnel = Effect.fn('openTunnel')(function* (host: string) {
   return socket;
 });
 
-const local = Effect.gen(function* () {
-  const token = yield* readLocalToken;
+const local = Effect.fn('local')(function* (platform: NodeJS.Platform) {
+  const token = yield* readLocalToken(platform);
   return Connection.of({
     location: 'this machine',
     token,
@@ -232,5 +249,5 @@ export const connectionLayer = (
 > =>
   Layer.effect(
     Connection,
-    target._tag === 'Local' ? local : overSsh(target.host),
+    target._tag === 'Local' ? local(target.platform) : overSsh(target.host),
   );

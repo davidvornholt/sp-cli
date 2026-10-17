@@ -15,7 +15,7 @@ This builds a standalone binary to `~/.local/bin/sp` and installs the agent skil
 
 ## Configure
 
-In Super Productivity, enable "Misc Settings > Enable local REST API (desktop only)". The app then listens on `127.0.0.1:3876` and writes a bearer token to `~/.config/superProductivity/local-rest-api-token`. sp reads that token, or `SP_TOKEN` if set. Check the connection:
+In Super Productivity, enable "Misc Settings > Enable local REST API (desktop only)". The app then listens on `127.0.0.1:3876` and writes a bearer token to `superProductivity/local-rest-api-token` in its config directory: `~/.config` on Linux (or `$XDG_CONFIG_HOME`), `~/Library/Application Support` on macOS, and `%APPDATA%` on Windows. sp reads that token, or `SP_TOKEN` if set. Check the connection:
 
 ```bash
 sp status
@@ -29,7 +29,7 @@ The API only listens on loopback, and the app rejects requests that don't look l
 sp --host david-x1-nixos tasks list --today --brief
 ```
 
-Set `SP_HOST` to make that the default. For each command, sp reads the token on the remote machine over SSH. It then forwards a Unix socket in a private temporary directory to the remote `127.0.0.1:3876` and closes the tunnel when the command ends. This needs non-interactive SSH login (keys or Tailscale SSH) and nothing else on either machine.
+Set `SP_HOST` to make that the default. For each command, sp reads the token on the remote machine over SSH, from the Linux location or, if that file is missing, the macOS one. It then forwards a Unix socket in a private temporary directory to the remote `127.0.0.1:3876` and closes the tunnel when the command ends. This needs non-interactive SSH login (keys or Tailscale SSH) and nothing else on either machine.
 
 ## Use
 
