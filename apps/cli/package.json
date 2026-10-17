@@ -10,8 +10,8 @@
     "install:user": "bun run build && bun scripts/install.ts"
   },
   "dependencies": {
-    "@effect/platform-bun": "4.0.0",
-    "effect": "4.0.0"
+    "@effect/platform-bun": "4.0.4",
+    "effect": "4.0.4"
   },
   "devDependencies": {
     "@davidvornholt/typescript-config": "workspace:*",
