@@ -20,13 +20,16 @@
       },
       "devDependencies": {
         "@davidvornholt/typescript-config": "workspace:*",
-        "@types/bun": "^1.4.2",
+        "@types/bun": "^1.4.3",
         "typescript": "7.0.2",
       },
     },
     "packages/a11y-testing": {
       "name": "@davidvornholt/a11y-testing",
       "version": "0.0.0",
+      "bin": {
+        "a11y-playwright": "./src/a11y-playwright.ts",
+      },
       "dependencies": {
         "@axe-core/playwright": "^4.13.0",
         "@playwright/test": "1.63.0",
@@ -34,7 +37,7 @@
       },
       "devDependencies": {
         "@davidvornholt/typescript-config": "workspace:*",
-        "@types/bun": "^1.4.2",
+        "@types/bun": "^1.4.3",
         "typescript": "7.0.2",
       },
     },
@@ -42,7 +45,7 @@
       "name": "@davidvornholt/typescript-config",
       "version": "0.0.0",
       "devDependencies": {
-        "@types/bun": "^1.4.2",
+        "@types/bun": "^1.4.3",
         "typescript": "7.0.2",
       },
     },
@@ -94,7 +97,7 @@
 
     "@turbo/windows-arm64": ["@turbo/windows-arm64@2.11.7", "", { "os": "win32", "cpu": "arm64" }, "sha512-88Xv2f7SLGVJ68lRRx8o375dKmnZYNdDtvlKcPA0kZpcF93eAQd8l96BKQ0/AMHG0bMJA0Z5QqoqtetxzNsC+g=="],
 
-    "@types/bun": ["@types/bun@1.4.2", "", { "dependencies": { "bun-types": "1.4.2" } }, "sha512-GimotNn7+ZV0uVArItBbriZsR1oNf0+WTzPkdcFrzShI7k2norL0uzEaJT8T33dWr7O/c9ZDuAFQrctKCi72oQ=="],
+    "@types/bun": ["@types/bun@1.4.3", "", { "dependencies": { "bun-types": "1.4.3" } }, "sha512-N67Pqy8JXbAY/j0tNraS3V5mubGvc6rrrNDmDCtZLlFzccbUJPDb0tvgUBC5q4m8ybkP93Jcn1QB+RYQ6PvBhw=="],
 
     "@types/node": ["@types/node@26.6.4", "", { "dependencies": { "undici-types": "~8.9.0" } }, "sha512-ldVPDCzj7fsaGZrLB0NuHuTvJcsNasysBAqMolr/cgxrLd1xbqxIr3XJiPnHHJUCxj5sNF1vnRj9aWnrVh5Jcg=="],
 
@@ -142,7 +145,7 @@
 
     "axe-core": ["axe-core@4.13.0", "", {}, "sha512-UzGt8zg7Ny8djbYMhxl2zuEevVa7r2gJjYY5Lwr1xM7+XU2nd6CkIWFTVcCIbAP63vSz71NaVyyuSk9lHKcy0A=="],
 
-    "bun-types": ["bun-types@1.4.2", "", { "dependencies": { "@types/node": "*" } }, "sha512-bxV1FgK7yBIzjRe5zBozIM4Bem11ZJcCXSrjWRG3YWLt8yFDePu4cLjpebO8OvPeIE9trbyPF4fuj3Cia4Fj3w=="],
+    "bun-types": ["bun-types@1.4.3", "", { "dependencies": { "@types/node": "*", "undici-types": "*" } }, "sha512-tinRJNGOmUN+tEAsn2y2e942n9JHRHR42iUYzDH75NmhJqVBokGSQkkfSFdNWwsANIdrK6ACH9t01M452YyTwg=="],
 
     "effect": ["effect@4.0.0", "", {}, "sha512-ooc1TG5t+FfzgYnFz2ff6BBKyZ7EwBRVXC7c4RhQUAD6/TZ2gTXXMeb4WX7a19ozQo4J73/QW+S00YAIresoMQ=="],
 
