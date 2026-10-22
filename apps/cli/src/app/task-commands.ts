@@ -1,4 +1,4 @@
-import { Clock, Effect, Option, Result, Schema } from 'effect';
+import { Effect, Option, Schema } from 'effect';
 import { Argument, Command, Flag } from 'effect/cli';
 import {
   buildTaskFields,
@@ -16,35 +16,17 @@ import {
   updateTask,
 } from '../features/tasks/tasks';
 import { resolveWorkContextId } from '../features/work-contexts/work-contexts';
+import {
+  fail,
+  flag,
+  fromResult,
+  nowDate,
+  optionalString,
+  repeatedString,
+  taskId,
+} from './command-inputs';
 import { runApi } from './root';
-
-const taskId = Argument.String('id').pipe(Argument.withDescription('Task id'));
-
-const optionalString = (name: string, description: string) =>
-  Flag.String(name).pipe(Flag.withDescription(description), Flag.optional);
-
-const flag = (name: string, description: string) =>
-  Flag.Boolean(name).pipe(
-    Flag.withDescription(description),
-    Flag.withDefault(false),
-  );
-
-const repeatedString = (name: string, description: string) =>
-  Flag.String(name).pipe(Flag.withDescription(description), Flag.atLeast(0));
-
-const nowDate = Effect.map(
-  Clock.currentTimeMillis,
-  (ms) => new Date(Number(ms)),
-);
-
-const fromResult = <A>(
-  result: Result.Result<A, InvalidInput>,
-): Effect.Effect<A, InvalidInput> =>
-  Result.isSuccess(result)
-    ? Effect.succeed(result.success)
-    : Effect.fail(result.failure);
-
-const fail = (message: string) => Effect.fail(new InvalidInput({ message }));
+import { time } from './task-time-command';
 
 // `--notes -` reads the notes from stdin, which keeps long Markdown out of
 // shell quoting.
@@ -355,6 +337,7 @@ export const tasks = Command.make('tasks').pipe(
     update,
     remove,
     start,
+    time,
     archive,
     restore,
   ]),

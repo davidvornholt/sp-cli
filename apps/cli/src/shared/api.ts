@@ -1,7 +1,12 @@
 import { Context, Effect, Layer, Schema } from 'effect';
 import { FetchHttpClient, HttpClient, HttpClientRequest } from 'effect/http';
 import { apiOrigin, Connection } from './connection';
-import { ApiError, type ApiFailure, AppUnreachable } from './errors/errors';
+import {
+  ApiError,
+  type ApiFailure,
+  AppOutdated,
+  AppUnreachable,
+} from './errors/errors';
 
 // Every response uses this envelope, including errors.
 const Envelope = Schema.Union([
@@ -20,7 +25,7 @@ const decodeEnvelope = Schema.decodeUnknownEffect(Envelope);
 export type QueryValue = string | boolean | undefined;
 
 export type ApiRequest = {
-  readonly method: 'GET' | 'POST' | 'PATCH' | 'DELETE';
+  readonly method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   readonly path: string;
   readonly query?: Readonly<Record<string, QueryValue>>;
   readonly body?: unknown;
@@ -85,6 +90,13 @@ export class Api extends Context.Service<
         );
         if (envelope.ok) {
           return envelope.data;
+        }
+        // The app's code for an unknown route. Missing tasks and projects
+        // have their own codes.
+        if (envelope.error.code === 'NOT_FOUND') {
+          return yield* new AppOutdated({
+            message: `Super Productivity on ${connection.location} doesn't support ${method} ${path}. Update the app to a newer release.`,
+          });
         }
         return yield* new ApiError({
           status: response.status,
