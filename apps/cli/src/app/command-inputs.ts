@@ -30,6 +30,19 @@ export const flag = (name: string, description: string) =>
 export const repeatedString = (name: string, description: string) =>
   Flag.String(name).pipe(Flag.withDescription(description), Flag.atLeast(0));
 
+// `-` reads the Markdown from stdin, which keeps long text out of shell
+// quoting.
+export const readMarkdown = (value: string) =>
+  value === '-'
+    ? Effect.promise(() => Bun.stdin.text())
+    : Effect.succeed(value);
+
+export const readOptionalMarkdown = (value: Option.Option<string>) =>
+  Option.match(value, {
+    onNone: () => Effect.succeed(undefined),
+    onSome: readMarkdown,
+  });
+
 export const nowDate = Effect.map(
   Clock.currentTimeMillis,
   (ms) => new Date(Number(ms)),

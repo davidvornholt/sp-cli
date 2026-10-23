@@ -23,23 +23,13 @@ import {
   nowDate,
   once,
   optionalString,
+  readOptionalMarkdown,
   repeatedString,
   resolveOptional,
   taskId,
 } from './command-inputs';
 import { runApi } from './root';
 import { time } from './task-time-command';
-
-// `--notes -` reads the notes from stdin, which keeps long Markdown out of
-// shell quoting.
-const readNotes = (notes: Option.Option<string>) =>
-  Option.match(notes, {
-    onNone: () => Effect.succeed(undefined),
-    onSome: (value) =>
-      value === '-'
-        ? Effect.promise(() => Bun.stdin.text())
-        : Effect.succeed(value),
-  });
 
 const resolveAll = (
   kind: 'project' | 'tag',
@@ -165,7 +155,7 @@ const add = Command.make(
           );
         }
         const fieldOptions: TaskFieldOptions = {
-          notes: yield* readNotes(options.notes),
+          notes: yield* readOptionalMarkdown(options.notes),
           estimate: Option.getOrUndefined(options.estimate),
           projectId: yield* resolveOptional('project', options.project),
           tagIds:
@@ -271,7 +261,7 @@ const update = Command.make(
         }
         const fieldOptions: TaskFieldOptions = {
           title: Option.getOrUndefined(options.title),
-          notes: yield* readNotes(options.notes),
+          notes: yield* readOptionalMarkdown(options.notes),
           isDone: options.done || (options.undone ? false : undefined),
           estimate: Option.getOrUndefined(options.estimate),
           projectId: yield* resolveOptional('project', options.project),
