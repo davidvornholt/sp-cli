@@ -3,6 +3,7 @@ import { BunServices } from '@effect/platform-bun';
 import { Effect } from 'effect';
 import { Command } from 'effect/cli';
 import packageJson from '../../package.json' with { type: 'json' };
+import { notes } from './note-commands';
 import { report } from './output';
 import { repeats } from './repeat-commands';
 import { root } from './root';
@@ -18,6 +19,7 @@ const sp = root.pipe(
     focus,
     tasks,
     repeats,
+    notes,
     projects,
     tags,
   ]),
