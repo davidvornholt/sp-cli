@@ -15,7 +15,7 @@ This builds a standalone binary to `~/.local/bin/sp` and installs the agent skil
 
 ## Configure
 
-In Super Productivity, enable "Misc Settings > Enable local REST API (desktop only)". The app then listens on `127.0.0.1:3876` and writes a bearer token to `superProductivity/local-rest-api-token` in its config directory: `~/.config` on Linux (or `$XDG_CONFIG_HOME`), `~/Library/Application Support` on macOS, and `%APPDATA%` on Windows. sp reads that token, or `SP_TOKEN` if set. Check the connection:
+In Super Productivity, enable "Misc Settings > Enable local REST API (desktop only)". The app then listens on `127.0.0.1:3876` and writes a bearer token to `superProductivity/local-rest-api-token` in its config directory: `~/.config` on Linux (or `$XDG_CONFIG_HOME`), `~/Library/Application Support` on macOS, and `%APPDATA%` on Windows. sp reads the token from that default location, or from `SP_TOKEN` if set. Set `SP_TOKEN` when the app runs with `--user-data-dir`, or as a Snap or Flatpak, because the file is somewhere else then. Check the connection:
 
 ```bash
 sp status
@@ -35,7 +35,7 @@ Set `SP_HOST` to make that the default. For each command, sp reads the token on 
 
 Run `sp --help` for the commands and `sp <command> --help` for their options. The skill in [`apps/cli/skills/super-productivity`](apps/cli/skills/super-productivity/SKILL.md) tells agents how to use them.
 
-The REST API covers tasks, time tracking, and repeating tasks. Projects and tags are read-only. `sp repeats` needs Super Productivity 19.2.0 or newer, and it changes only the schedule, pause state, and overdue handling: a repeat config takes its title, notes, tags, estimate, and time from the task when it is created. The app's separate notes aren't exposed yet.
+The REST API covers tasks, time tracking, and repeating tasks. Projects and tags are read-only. `sp repeats` needs Super Productivity 19.2.0 or newer. It changes only the schedule, pause state, and overdue handling; a repeat config takes everything else from its task when it's created. The app's separate notes aren't exposed yet.
 
 ## Develop
 

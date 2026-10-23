@@ -12,11 +12,17 @@ export const taskId = Argument.String('id').pipe(
 export const optionalString = (name: string, description: string) =>
   Flag.String(name).pipe(Flag.withDescription(description), Flag.optional);
 
-export const flag = (name: string, description: string) =>
+// The parser keeps the first of repeated flags, so `--x --no-x` would mean
+// `--x`. Allowing one occurrence turns that contradiction into an error.
+export const toggle = (name: string, description: string) =>
   Flag.Boolean(name).pipe(
     Flag.withDescription(description),
-    Flag.withDefault(false),
+    Flag.atMost(1),
+    Flag.map((values) => Option.fromUndefinedOr(values[0])),
   );
+
+export const flag = (name: string, description: string) =>
+  toggle(name, description).pipe(Flag.map(Option.getOrElse(() => false)));
 
 export const repeatedString = (name: string, description: string) =>
   Flag.String(name).pipe(Flag.withDescription(description), Flag.atLeast(0));

@@ -146,6 +146,12 @@ describe('buildRepeatFields validation', () => {
     ],
     ['an unknown weekday', { on: ['mo'] }, true, 'unknown weekday "mo"'],
     ['an empty weekday list', { on: [','] }, true, 'at least one weekday'],
+    [
+      'a start day before the year 1000',
+      { startDay: '0999-12-31' },
+      false,
+      '--start must be 1000-01-01 or later',
+    ],
   ] as const)('rejects %s', (_name, options, isCreate, message) => {
     expect(failureMessage(build(options, isCreate))).toContain(message);
   });

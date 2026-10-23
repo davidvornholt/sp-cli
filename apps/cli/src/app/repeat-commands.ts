@@ -27,6 +27,7 @@ import {
   optionalString,
   repeatedString,
   resolveOptional,
+  toggle,
 } from './command-inputs';
 import { runApi } from './root';
 
@@ -39,7 +40,7 @@ const repeatId = Argument.String('id').pipe(
 const scheduleFlags = {
   schedule: Flag.Literals('schedule', presetNames).pipe(
     Flag.withDescription(
-      'Preset schedule; weekly, monthly, and yearly follow the start date (weekly on its weekday)',
+      'Preset schedule; weekly, monthly, monthly-nth-weekday, and yearly follow the start date (weekly on its weekday)',
     ),
     Flag.optional,
   ),
@@ -63,11 +64,9 @@ const scheduleFlags = {
     'start',
     'First day of the schedule (YYYY-MM-DD, today, tomorrow)',
   ),
-  skipOverdue: Flag.Boolean('skip-overdue').pipe(
-    Flag.withDescription(
-      'Skip missed instances instead of letting them pile up; --no-skip-overdue keeps them (default on create: on for daily schedules only)',
-    ),
-    Flag.optional,
+  skipOverdue: toggle(
+    'skip-overdue',
+    'Skip missed instances instead of letting them pile up; --no-skip-overdue keeps them (default on create: on for daily schedules only)',
   ),
 };
 
