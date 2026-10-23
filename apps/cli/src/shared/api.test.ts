@@ -94,6 +94,33 @@ describe('Api', () => {
     });
   });
 
+  it('reports an unknown route as an outdated app', async () => {
+    const { layer } = fakeConnection(
+      httpNotFound,
+      JSON.stringify({
+        ok: false,
+        error: { code: 'NOT_FOUND', message: 'Route not found' },
+      }),
+    );
+    const result = await run(
+      Effect.flatMap(Api, (api) =>
+        api.request({
+          method: 'PUT',
+          path: '/tasks/t1/time',
+          body: { date: '2026-10-21', duration: 0 },
+        }),
+      ),
+      layer,
+    );
+    expect(result).toMatchObject({
+      _tag: 'Failure',
+      failure: {
+        _tag: 'AppOutdated',
+        message: expect.stringContaining('PUT /tasks/t1/time'),
+      },
+    });
+  });
+
   it('reports a non-API answer as unreachable', async () => {
     const { layer } = fakeConnection(httpOk, '<html></html>');
     const result = await run(

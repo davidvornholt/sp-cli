@@ -15,6 +15,8 @@ Run `sp --help` for commands and `sp <command> --help` for options. Output is JS
 - Put the project, tags, due date, and estimate in flags, not in the title. The app reads short syntax in titles: `#tag`, `+project`, `@date`, and durations like `1h`. `--literal` turns that off only in app versions newer than 19.1.0. On older versions, avoid those patterns in titles and check the printed task.
 - `update --tag` replaces all tags. Use `--add-tag` and `--remove-tag` to change one.
 - Subtasks: `add --parent <id>`. They take their project and tags from the parent. `tasks list` returns subtasks as separate tasks with `parentId` set.
-- `tasks start <id>` starts time tracking and `sp stop` stops it. `sp current` shows the tracked task. Tracked time can't be edited.
+- `tasks start <id>` starts time tracking and `sp stop` stops it. `sp current` shows the tracked task. `tasks time <id> --add 25m --day <date>` logs time spent on a day. `--set` replaces that day's time, and `--set 0` removes it.
+- When logging work after the fact, count only the time the user spent: writing prompts, reading results, reviewing, and deciding. Don't count time an agent worked on its own.
+- New tasks land on Today when the app shows the Today view. For work done on an earlier day, pass `--due` with that day.
 - Mark finished work with `update <id> --done`. Archive or delete a task only when the user asks. `delete` also removes its subtasks and can't be undone.
 - Notes are Markdown. Pipe long notes on stdin with `--notes -` and a quoted heredoc (`<<'EOF'`). `--notes` replaces the existing notes, so read them first with `tasks get` when adding to them.

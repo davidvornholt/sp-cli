@@ -27,4 +27,11 @@ export class AppUnreachable extends Schema.TaggedError<AppUnreachable>()(
   { message: Schema.String },
 ) {}
 
-export type ApiFailure = ApiError | AppUnreachable;
+// The app answered but doesn't know the route. sp only calls routes the app
+// has added, so the running app is older than the command.
+export class AppOutdated extends Schema.TaggedError<AppOutdated>()(
+  'AppOutdated',
+  { message: Schema.String },
+) {}
+
+export type ApiFailure = ApiError | AppOutdated | AppUnreachable;
