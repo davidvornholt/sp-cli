@@ -57,9 +57,12 @@ const set = Command.make(
   ({ id, value, day }) =>
     runApi(
       Effect.gen(function* () {
-        const date = Option.isSome(day)
-          ? yield* fromResult(parseDay(day.value, yield* nowDate))
-          : undefined;
+        // The app's today follows its own clock and day start, so today is
+        // left to the app rather than resolved here.
+        const date =
+          Option.isSome(day) && day.value.trim().toLowerCase() !== 'today'
+            ? yield* fromResult(parseDay(day.value, yield* nowDate))
+            : undefined;
         return yield* setCounterValue(id, value, date);
       }),
     ),

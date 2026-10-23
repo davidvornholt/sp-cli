@@ -111,14 +111,17 @@ describe('sp counters increment', () => {
 });
 
 describe('sp counters set', () => {
-  it("leaves the default day to the app's today", async () => {
-    await runOk('set', 'c1', '5');
-    expect(lastRequest()).toEqual({
-      method: 'PUT',
-      path: '/simple-counters/c1/value',
-      body: { value: 5 },
-    });
-  });
+  it.each([[[]], [['--day', 'today']], [['--day', ' Today ']]])(
+    "leaves the day to the app's today with %j",
+    async (dayArgs) => {
+      await runOk('set', 'c1', '5', ...dayArgs);
+      expect(lastRequest()).toEqual({
+        method: 'PUT',
+        path: '/simple-counters/c1/value',
+        body: { value: 5 },
+      });
+    },
+  );
 
   it('sets the value of another day', async () => {
     await runOk('set', 'c1', '0', '--day', '2026-10-20');
