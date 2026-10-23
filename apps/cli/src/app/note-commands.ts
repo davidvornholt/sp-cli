@@ -1,5 +1,5 @@
 import { Effect, Option } from 'effect';
-import { Argument, Command, Flag } from 'effect/cli';
+import { Argument, Command } from 'effect/cli';
 import {
   createNote,
   deleteNote,
@@ -16,6 +16,7 @@ import {
   readMarkdown,
   readOptionalMarkdown,
   resolveOptional,
+  toggle,
 } from './command-inputs';
 import { runApi } from './root';
 
@@ -92,11 +93,9 @@ const update = Command.make(
       'project',
       'Move to this project (id or title); pass it without other options',
     ),
-    today: Flag.Boolean('today').pipe(
-      Flag.withDescription(
-        'Pin to Today; --no-today unpins a note that is in a project',
-      ),
-      Flag.optional,
+    today: toggle(
+      'today',
+      'Pin to Today; --no-today unpins a note that is in a project',
     ),
   },
   ({ id, content, project, today }) =>
