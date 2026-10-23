@@ -248,6 +248,21 @@ describe('sp repeats errors', () => {
     expect(sent).toEqual([]);
   });
 
+  it.each([
+    [['update', 'r1', '--skip-overdue', '--no-skip-overdue']],
+    [['add', 't1', '--no-paused', '--paused']],
+    [['update', 'r1', '--every', '2', '--every', '3']],
+  ])('rejects the repeated flag in %j', async (args) => {
+    expect(await run(...args)).toMatchObject({
+      _tag: 'Failure',
+      failure: {
+        _tag: 'ShowHelp',
+        errors: [{ _tag: 'InvalidValue', value: '2 occurrences' }],
+      },
+    });
+    expect(sent).toEqual([]);
+  });
+
   it('rejects a start day change when the config has no preset', async () => {
     replies = { ...replies, 'GET /task-repeat-cfgs/r1': ok({ id: 'r1' }) };
     const result = await run('update', 'r1', '--start', '2027-03-01');
