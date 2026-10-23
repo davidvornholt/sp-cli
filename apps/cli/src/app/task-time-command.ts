@@ -2,7 +2,13 @@ import { Effect, Option } from 'effect';
 import { Command, Flag } from 'effect/cli';
 import { buildTimeEntry } from '../features/tasks/task-time';
 import { logTaskTime } from '../features/tasks/tasks';
-import { fromResult, nowDate, optionalString, taskId } from './command-inputs';
+import {
+  fromResult,
+  nowDate,
+  once,
+  optionalString,
+  taskId,
+} from './command-inputs';
 import { runApi } from './root';
 
 export const time = Command.make(
@@ -14,12 +20,13 @@ export const time = Command.make(
       'set',
       "Replace the day's time with this; 0 removes it",
     ),
-    day: Flag.String('day').pipe(
-      Flag.withDescription(
-        'Day the time was spent, YYYY-MM-DD or today (default: today)',
+    day: once(
+      Flag.String('day').pipe(
+        Flag.withDescription(
+          'Day the time was spent, YYYY-MM-DD or today (default: today)',
+        ),
       ),
-      Flag.withDefault('today'),
-    ),
+    ).pipe(Flag.map(Option.getOrElse(() => 'today'))),
   },
   (options) =>
     runApi(

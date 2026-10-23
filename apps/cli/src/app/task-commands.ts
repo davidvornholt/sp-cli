@@ -21,6 +21,7 @@ import {
   flag,
   fromResult,
   nowDate,
+  once,
   optionalString,
   repeatedString,
   resolveOptional,
@@ -88,10 +89,11 @@ const list = Command.make(
     tag: optionalString('tag', 'Only tasks with this tag (id or title)'),
     today: flag('today', 'Only tasks on the Today list (due today)'),
     includeDone: flag('include-done', 'Include done tasks'),
-    source: Flag.Literals('source', ['active', 'archived', 'all']).pipe(
-      Flag.withDescription('Search active tasks, the archive, or both'),
-      Flag.withDefault('active'),
-    ),
+    source: once(
+      Flag.Literals('source', ['active', 'archived', 'all']).pipe(
+        Flag.withDescription('Search active tasks, the archive, or both'),
+      ),
+    ).pipe(Flag.map(Option.getOrElse(() => 'active' as const))),
     brief: flag('brief', 'Print only the main fields of each task'),
   },
   ({ query, project, tag, today, includeDone, source, brief }) =>

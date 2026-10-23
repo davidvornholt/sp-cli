@@ -251,7 +251,8 @@ describe('sp repeats errors', () => {
   it.each([
     [['update', 'r1', '--skip-overdue', '--no-skip-overdue']],
     [['add', 't1', '--no-paused', '--paused']],
-  ])('rejects the contradictory flags in %j', async (args) => {
+    [['update', 'r1', '--every', '2', '--every', '3']],
+  ])('rejects the repeated flag in %j', async (args) => {
     expect(await run(...args)).toMatchObject({
       _tag: 'Failure',
       failure: {

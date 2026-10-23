@@ -24,6 +24,7 @@ import {
   flag,
   fromResult,
   nowDate,
+  once,
   optionalString,
   repeatedString,
   resolveOptional,
@@ -38,23 +39,26 @@ const repeatId = Argument.String('id').pipe(
 );
 
 const scheduleFlags = {
-  schedule: Flag.Literals('schedule', presetNames).pipe(
-    Flag.withDescription(
-      'Preset schedule; weekly, monthly, monthly-nth-weekday, and yearly follow the start date (weekly on its weekday)',
+  schedule: once(
+    Flag.Literals('schedule', presetNames).pipe(
+      Flag.withDescription(
+        'Preset schedule; weekly, monthly, monthly-nth-weekday, and yearly follow the start date (weekly on its weekday)',
+      ),
     ),
-    Flag.optional,
   ),
-  cycle: Flag.Literals('cycle', cycleNames).pipe(
-    Flag.withDescription(
-      'Custom schedule: repeat by day, week, month, or year',
+  cycle: once(
+    Flag.Literals('cycle', cycleNames).pipe(
+      Flag.withDescription(
+        'Custom schedule: repeat by day, week, month, or year',
+      ),
     ),
-    Flag.optional,
   ),
-  every: Flag.Int('every').pipe(
-    Flag.withDescription(
-      `Custom schedule: every N days, weeks, months, or years (1 to ${maxInterval})`,
+  every: once(
+    Flag.Int('every').pipe(
+      Flag.withDescription(
+        `Custom schedule: every N days, weeks, months, or years (1 to ${maxInterval})`,
+      ),
     ),
-    Flag.optional,
   ),
   on: repeatedString(
     'on',

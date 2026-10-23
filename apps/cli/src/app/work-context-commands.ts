@@ -1,20 +1,19 @@
 import { Option } from 'effect';
-import { Command, Flag } from 'effect/cli';
+import { Command } from 'effect/cli';
 import {
   listWorkContexts,
   type WorkContextKind,
 } from '../features/work-contexts/work-contexts';
+import { optionalString } from './command-inputs';
 import { runApi } from './root';
 
 const listCommand = (kind: WorkContextKind) =>
   Command.make(
     'list',
     {
-      query: Flag.String('query').pipe(
-        Flag.withDescription(
-          'Only titles containing this text (case-insensitive)',
-        ),
-        Flag.optional,
+      query: optionalString(
+        'query',
+        'Only titles containing this text (case-insensitive)',
       ),
     },
     ({ query }) => runApi(listWorkContexts(kind, Option.getOrUndefined(query))),
