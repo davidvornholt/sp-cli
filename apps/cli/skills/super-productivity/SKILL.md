@@ -1,6 +1,6 @@
 ---
 name: super-productivity
-description: Read and change the user's tasks, Today list, repeating tasks, notes, and time tracking in Super Productivity with the sp command. Use when the user asks about their tasks, to-dos, notes, plans for a day, or what they are working on, or wants tasks added, changed, completed, scheduled, repeated, or tracked, or notes written.
+description: Read and change the user's tasks, Today list, repeating tasks, notes, time tracking, and simple counters (habits) in Super Productivity with the sp command. Use when the user asks about their tasks, to-dos, notes, plans for a day, habits, or counters, or what they are working on, or wants tasks added, changed, completed, scheduled, repeated, or tracked, notes written, or a habit or counter updated.
 ---
 
 # Super Productivity
@@ -24,3 +24,4 @@ Run `sp --help` for commands and `sp <command> --help` for options. Output is JS
 - Repeating tasks: `sp repeats add <task-id>` makes an active top-level task repeat, daily by default. Set the task up completely first: the repeat config copies it (`sp repeats add --help` says what), and sp can't change that copy later. A recurring task shows its repeat config as `repeatCfgId`. `sp repeats list --project <project>` lists them, paused ones included.
 - Schedules: `--schedule` takes a preset. For a custom schedule use `--cycle`, `--every <n>`, and `--on mon,thu` for weekly ones. Presets that follow the start day need `--start` to pick the weekday or date; `sp repeats add --help` lists them. `--skip-overdue` and `--no-skip-overdue` decide whether missed instances pile up.
 - `sp repeats update <id>` changes the schedule and moves the next open instance to it. `pause` and `resume` stop and restart new instances. In Super Productivity 19.2.0, a paused repeat set to "Only create next task after completion" still creates its next instance when the open one is completed. `sp repeats delete <id>` stops the repetition and keeps the existing tasks. Pause or delete only when the user asks.
+- Simple counters are the habits and counters the user tracks per day in the app: click counters, stopwatches, and repeated countdown reminders. Change counters only when the user asks.

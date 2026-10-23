@@ -3,9 +3,10 @@ import { Result } from 'effect';
 import {
   formatDay,
   parseDateTime,
+  parseDay,
   parseDuration,
   parsePointInDay,
-} from './task-input';
+} from './input';
 
 // Date-time strings without an offset are local time, like the CLI's input.
 const local = (dateTime: string): Date => new Date(dateTime);
@@ -83,6 +84,13 @@ describe('parseDateTime', () => {
     expect(parseDateTime('2026-10-06T08:00', now)).toEqual(
       Result.succeed(local('2026-10-06T08:00').getTime()),
     );
+  });
+});
+
+describe('parseDay', () => {
+  it('keeps days and rejects times', () => {
+    expect(parseDay('today', now)).toEqual(Result.succeed('2026-10-04'));
+    expect(Result.isFailure(parseDay('2026-10-06T08:00', now))).toBe(true);
   });
 });
 

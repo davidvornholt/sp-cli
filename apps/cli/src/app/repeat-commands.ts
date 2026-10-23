@@ -18,7 +18,7 @@ import {
   updateRepeat,
   withQuickSetting,
 } from '../features/repeats/repeats';
-import { parsePointInDay } from '../features/tasks/task-input';
+import { parsePointInDay } from '../shared/input';
 import {
   fail,
   flag,
