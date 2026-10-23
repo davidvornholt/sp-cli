@@ -1,6 +1,7 @@
 import { Effect } from 'effect';
 import { Api } from '../../shared/api';
 import type { TaskFields } from './task-fields';
+import type { TimeEntry } from './task-time';
 
 // The app's virtual "Today" list: tasks due today, not a stored tag.
 export const todayTagId = 'TODAY';
@@ -90,4 +91,17 @@ export const taskAction = Effect.fn('taskAction')(function* (
 ) {
   const api = yield* Api;
   return yield* api.request({ method: 'POST', path: taskPath(id, action) });
+});
+
+export const logTaskTime = Effect.fn('logTaskTime')(function* (
+  id: string,
+  entry: TimeEntry,
+) {
+  const api = yield* Api;
+  return yield* api.request({
+    // POST adds to the day's time; PUT replaces it.
+    method: entry.mode === 'add' ? 'POST' : 'PUT',
+    path: taskPath(id, 'time'),
+    body: { date: entry.date, duration: entry.duration },
+  });
 });
