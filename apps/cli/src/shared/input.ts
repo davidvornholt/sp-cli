@@ -1,5 +1,5 @@
 import { Result } from 'effect';
-import { InvalidInput } from '../../shared/errors/errors';
+import { InvalidInput } from './errors/errors';
 
 // Turns the human-friendly values the CLI accepts into the fields the Super
 // Productivity API stores: durations in milliseconds, calendar days as
@@ -124,6 +124,22 @@ export const parseDateTime = (
       : Result.fail(
           new InvalidInput({
             message: `"${input}" needs a time; use YYYY-MM-DDTHH:MM`,
+          }),
+        ),
+  );
+
+// Logged time and counter values belong to a calendar day, so a time is
+// rejected.
+export const parseDay = (
+  input: string,
+  now: Date,
+): Result.Result<string, InvalidInput> =>
+  Result.flatMap(parsePointInDay(input, now), (point) =>
+    point._tag === 'Day'
+      ? Result.succeed(point.day)
+      : Result.fail(
+          new InvalidInput({
+            message: `"${input}" is not a day; use YYYY-MM-DD or today`,
           }),
         ),
   );
