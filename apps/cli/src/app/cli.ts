@@ -4,6 +4,7 @@ import { Effect } from 'effect';
 import { Command } from 'effect/cli';
 import packageJson from '../../package.json' with { type: 'json' };
 import { counters } from './counter-commands';
+import { notes } from './note-commands';
 import { report } from './output';
 import { repeats } from './repeat-commands';
 import { root } from './root';
@@ -20,6 +21,7 @@ const sp = root.pipe(
     tasks,
     repeats,
     counters,
+    notes,
     projects,
     tags,
   ]),

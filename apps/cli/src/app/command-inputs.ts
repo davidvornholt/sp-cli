@@ -9,17 +9,39 @@ export const taskId = Argument.String('id').pipe(
   Argument.withDescription('Task id'),
 );
 
+// Like `Flag.optional`, but a repeated flag is an error: the parser would keep
+// the first value, so `--every 2 --every 3` or `--x --no-x` would silently
+// mean the first one.
+export const once = <A>(self: Flag.Flag<A>): Flag.Flag<Option.Option<A>> =>
+  self.pipe(
+    Flag.atMost(1),
+    Flag.map((values) => Option.fromUndefinedOr(values[0])),
+  );
+
 export const optionalString = (name: string, description: string) =>
-  Flag.String(name).pipe(Flag.withDescription(description), Flag.optional);
+  once(Flag.String(name).pipe(Flag.withDescription(description)));
+
+export const toggle = (name: string, description: string) =>
+  once(Flag.Boolean(name).pipe(Flag.withDescription(description)));
 
 export const flag = (name: string, description: string) =>
-  Flag.Boolean(name).pipe(
-    Flag.withDescription(description),
-    Flag.withDefault(false),
-  );
+  toggle(name, description).pipe(Flag.map(Option.getOrElse(() => false)));
 
 export const repeatedString = (name: string, description: string) =>
   Flag.String(name).pipe(Flag.withDescription(description), Flag.atLeast(0));
+
+// `-` reads the Markdown from stdin, which keeps long text out of shell
+// quoting.
+export const readMarkdown = (value: string) =>
+  value === '-'
+    ? Effect.promise(() => Bun.stdin.text())
+    : Effect.succeed(value);
+
+export const readOptionalMarkdown = (value: Option.Option<string>) =>
+  Option.match(value, {
+    onNone: () => Effect.succeed(undefined),
+    onSome: readMarkdown,
+  });
 
 export const nowDate = Effect.map(
   Clock.currentTimeMillis,

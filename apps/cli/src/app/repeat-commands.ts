@@ -24,9 +24,11 @@ import {
   flag,
   fromResult,
   nowDate,
+  once,
   optionalString,
   repeatedString,
   resolveOptional,
+  toggle,
 } from './command-inputs';
 import { runApi } from './root';
 
@@ -37,23 +39,26 @@ const repeatId = Argument.String('id').pipe(
 );
 
 const scheduleFlags = {
-  schedule: Flag.Literals('schedule', presetNames).pipe(
-    Flag.withDescription(
-      'Preset schedule; weekly, monthly, and yearly follow the start date (weekly on its weekday)',
+  schedule: once(
+    Flag.Literals('schedule', presetNames).pipe(
+      Flag.withDescription(
+        'Preset schedule; weekly, monthly, monthly-nth-weekday, and yearly follow the start date (weekly on its weekday)',
+      ),
     ),
-    Flag.optional,
   ),
-  cycle: Flag.Literals('cycle', cycleNames).pipe(
-    Flag.withDescription(
-      'Custom schedule: repeat by day, week, month, or year',
+  cycle: once(
+    Flag.Literals('cycle', cycleNames).pipe(
+      Flag.withDescription(
+        'Custom schedule: repeat by day, week, month, or year',
+      ),
     ),
-    Flag.optional,
   ),
-  every: Flag.Int('every').pipe(
-    Flag.withDescription(
-      `Custom schedule: every N days, weeks, months, or years (1 to ${maxInterval})`,
+  every: once(
+    Flag.Int('every').pipe(
+      Flag.withDescription(
+        `Custom schedule: every N days, weeks, months, or years (1 to ${maxInterval})`,
+      ),
     ),
-    Flag.optional,
   ),
   on: repeatedString(
     'on',
@@ -63,11 +68,9 @@ const scheduleFlags = {
     'start',
     'First day of the schedule (YYYY-MM-DD, today, tomorrow)',
   ),
-  skipOverdue: Flag.Boolean('skip-overdue').pipe(
-    Flag.withDescription(
-      'Skip missed instances instead of letting them pile up; --no-skip-overdue keeps them (default on create: on for daily schedules only)',
-    ),
-    Flag.optional,
+  skipOverdue: toggle(
+    'skip-overdue',
+    'Skip missed instances instead of letting them pile up; --no-skip-overdue keeps them (default on create: on for daily schedules only)',
   ),
 };
 
