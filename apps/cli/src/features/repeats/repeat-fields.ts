@@ -57,6 +57,9 @@ type Weekday = (typeof weekdays)[number];
 
 export const maxInterval = 1000;
 
+// The app stores years before 1000 unpadded, so it rejects earlier start days.
+const minStartDay = '1000-01-01';
+
 // Writable repeat config fields as the CLI collects them. `startDay` is
 // already a YYYY-MM-DD day.
 export type RepeatFieldOptions = {
@@ -153,6 +156,9 @@ const scheduleFields = (
     return invalid(
       '--schedule picks a preset; --cycle, --every, and --on build a custom schedule. Use one or the other',
     );
+  }
+  if (options.startDay !== undefined && options.startDay < minStartDay) {
+    return invalid(`--start must be ${minStartDay} or later`);
   }
   const start =
     options.startDay === undefined ? {} : { startDate: options.startDay };
