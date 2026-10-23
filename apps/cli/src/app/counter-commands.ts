@@ -7,7 +7,7 @@ import {
   setCounterValue,
 } from '../features/counters/counters';
 import { parseDay } from '../shared/input';
-import { fromResult, nowDate, optionalString } from './command-inputs';
+import { fromResult, nowDate, once, optionalString } from './command-inputs';
 import { runApi } from './root';
 
 const counterId = Argument.String('id').pipe(
@@ -28,9 +28,8 @@ const increment = Command.make(
   'increment',
   {
     id: counterId,
-    by: Flag.Int('by').pipe(
-      Flag.withDescription('Add this much (default: 1)'),
-      Flag.optional,
+    by: once(
+      Flag.Int('by').pipe(Flag.withDescription('Add this much (default: 1)')),
     ),
   },
   ({ id, by }) => runApi(incrementCounter(id, Option.getOrUndefined(by))),
