@@ -2,9 +2,6 @@ import { Effect } from 'effect';
 import { Api } from '../../shared/api';
 import { InvalidInput } from '../../shared/errors/errors';
 
-// Simple counters: the app's click counters, stopwatches, and repeated
-// countdown reminders, each with one value per day.
-
 const counterPath = (id: string, action?: 'value' | 'increment'): string =>
   `/simple-counters/${encodeURIComponent(id)}${action === undefined ? '' : `/${action}`}`;
 
