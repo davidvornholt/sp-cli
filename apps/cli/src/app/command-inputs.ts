@@ -1,6 +1,7 @@
-import { Clock, Effect, Result } from 'effect';
+import { Clock, Effect, Option, Result } from 'effect';
 import { Argument, Flag } from 'effect/cli';
-import { InvalidInput } from '../features/tasks/task-input';
+import { resolveWorkContextId } from '../features/work-contexts/work-contexts';
+import { InvalidInput } from '../shared/errors/errors';
 
 // Arguments, flags, and input helpers that several commands share.
 
@@ -34,3 +35,12 @@ export const fromResult = <A>(
 
 export const fail = (message: string) =>
   Effect.fail(new InvalidInput({ message }));
+
+export const resolveOptional = (
+  kind: 'project' | 'tag',
+  reference: Option.Option<string>,
+) =>
+  Option.match(reference, {
+    onNone: () => Effect.succeed(undefined),
+    onSome: (value) => resolveWorkContextId(kind, value),
+  });

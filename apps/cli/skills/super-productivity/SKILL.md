@@ -1,6 +1,6 @@
 ---
 name: super-productivity
-description: Read and change the user's tasks, Today list, and time tracking in Super Productivity with the sp command. Use when the user asks about their tasks, to-dos, plans for a day, or what they are working on, or wants tasks added, changed, completed, scheduled, or tracked.
+description: Read and change the user's tasks, Today list, repeating tasks, and time tracking in Super Productivity with the sp command. Use when the user asks about their tasks, to-dos, plans for a day, or what they are working on, or wants tasks added, changed, completed, scheduled, repeated, or tracked.
 ---
 
 # Super Productivity
@@ -20,3 +20,6 @@ Run `sp --help` for commands and `sp <command> --help` for options. Output is JS
 - New tasks land on Today when the app shows the Today view. For work done on an earlier day, pass `--due` with that day.
 - Mark finished work with `update <id> --done`. Archive or delete a task only when the user asks. `delete` also removes its subtasks and can't be undone.
 - Notes are Markdown. Pipe long notes on stdin with `--notes -` and a quoted heredoc (`<<'EOF'`). `--notes` replaces the existing notes, so read them first with `tasks get` when adding to them.
+- Repeating tasks: `sp repeats add <task-id>` makes an active top-level task repeat, daily by default. It copies the task's title, notes, tags, estimate, and time, which can't be changed later through sp. A recurring task shows its repeat config as `repeatCfgId`. `sp repeats list --project <project>` lists them, paused ones included.
+- Schedules: `--schedule` takes a preset (`daily`, `weekdays`, `weekly`, `monthly`, `monthly-first-day`, `monthly-last-day`, `monthly-nth-weekday`, `yearly`). `weekly`, `monthly`, `monthly-nth-weekday`, and `yearly` follow the start day, so pass `--start` to pick the weekday or date. For a custom schedule use `--cycle`, `--every <n>`, and `--on mon,thu` for weekly ones. `--skip-overdue` and `--no-skip-overdue` decide whether missed instances pile up.
+- `sp repeats update <id>` changes the schedule and moves the next open instance to it. `pause` and `resume` stop and restart new instances. `sp repeats delete <id>` stops the repetition and keeps the existing tasks. Pause or delete only when the user asks.

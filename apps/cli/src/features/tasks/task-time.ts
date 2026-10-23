@@ -1,5 +1,6 @@
 import { Result } from 'effect';
-import { InvalidInput, parseDuration, parsePointInDay } from './task-input';
+import { InvalidInput } from '../../shared/errors/errors';
+import { parseDuration, parsePointInDay } from './task-input';
 
 // One change to the time a task has on a calendar day: add to it, or replace
 // it. Replacing it with 0 removes the day.

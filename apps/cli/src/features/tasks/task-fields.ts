@@ -1,10 +1,6 @@
 import { Result } from 'effect';
-import {
-  InvalidInput,
-  parseDateTime,
-  parseDuration,
-  parsePointInDay,
-} from './task-input';
+import { InvalidInput } from '../../shared/errors/errors';
+import { parseDateTime, parseDuration, parsePointInDay } from './task-input';
 
 // Writable task fields as the CLI collects them. Project and tag values are
 // already resolved to ids. `null` clears a field on update.

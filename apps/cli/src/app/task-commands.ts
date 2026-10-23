@@ -4,7 +4,6 @@ import {
   buildTaskFields,
   type TaskFieldOptions,
 } from '../features/tasks/task-fields';
-import { InvalidInput } from '../features/tasks/task-input';
 import { summarizeTasks } from '../features/tasks/task-summary';
 import {
   createTask,
@@ -16,6 +15,7 @@ import {
   updateTask,
 } from '../features/tasks/tasks';
 import { resolveWorkContextId } from '../features/work-contexts/work-contexts';
+import { InvalidInput } from '../shared/errors/errors';
 import {
   fail,
   flag,
@@ -23,6 +23,7 @@ import {
   nowDate,
   optionalString,
   repeatedString,
+  resolveOptional,
   taskId,
 } from './command-inputs';
 import { runApi } from './root';
@@ -46,15 +47,6 @@ const resolveAll = (
   Effect.forEach(references, (reference) =>
     resolveWorkContextId(kind, reference),
   );
-
-const resolveOptional = (
-  kind: 'project' | 'tag',
-  reference: Option.Option<string>,
-) =>
-  Option.match(reference, {
-    onNone: () => Effect.succeed(undefined),
-    onSome: (value) => resolveWorkContextId(kind, value),
-  });
 
 // Mutually exclusive "set" and "clear" flags for one field: undefined leaves
 // it alone, null clears it.

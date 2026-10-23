@@ -4,6 +4,7 @@ import { Effect } from 'effect';
 import { Command } from 'effect/cli';
 import packageJson from '../../package.json' with { type: 'json' };
 import { report } from './output';
+import { repeats } from './repeat-commands';
 import { root } from './root';
 import { tasks } from './task-commands';
 import { current, focus, status, stop } from './tracking-commands';
@@ -16,6 +17,7 @@ const sp = root.pipe(
     stop,
     focus,
     tasks,
+    repeats,
     projects,
     tags,
   ]),
