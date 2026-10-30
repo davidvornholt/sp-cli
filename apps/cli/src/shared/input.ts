@@ -106,7 +106,11 @@ export const parsePointInDay = (
   if (dateTime !== null) {
     const { year, month, date, hours, minutes } = numericGroups(dateTime);
     const value = new Date(year, month - 1, date, hours, minutes);
-    return isRealDate(value, year, month, date) && hours < 24 && minutes < 60
+    // A time the clocks skip when daylight saving starts doesn't exist; Date
+    // would silently move it an hour later.
+    return isRealDate(value, year, month, date) &&
+      value.getHours() === hours &&
+      value.getMinutes() === minutes
       ? Result.succeed({ _tag: 'DateTime', epochMs: value.getTime() })
       : invalid;
   }

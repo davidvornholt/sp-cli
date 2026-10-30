@@ -1,4 +1,6 @@
-import { describe, expect, it } from 'bun:test';
+import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
+// biome-ignore lint/correctness/noNodejsModules: sets TZ so the daylight saving tests run in Berlin time on any machine
+import process from 'node:process';
 import { Result } from 'effect';
 import {
   formatDay,
@@ -75,6 +77,42 @@ describe('parsePointInDay', () => {
     'next week',
   ])('rejects %p', (input) => {
     expect(Result.isFailure(parsePointInDay(input, now))).toBe(true);
+  });
+
+  describe('across daylight saving changes in Berlin', () => {
+    const originalTimeZone = process.env.TZ;
+    beforeAll(() => {
+      process.env.TZ = 'Europe/Berlin';
+    });
+    afterAll(() => {
+      if (originalTimeZone === undefined) {
+        delete process.env.TZ;
+      } else {
+        process.env.TZ = originalTimeZone;
+      }
+    });
+
+    // Clocks jump from 02:00 to 03:00 on 28 March 2027, so 02:30 never happens.
+    it('rejects a time the clocks skip', () => {
+      expect(Result.isFailure(parsePointInDay('2027-03-28T02:30', now))).toBe(
+        true,
+      );
+    });
+
+    it('accepts the times around the skipped hour', () => {
+      expect(parsePointInDay('2027-03-28T01:59', now)).toEqual(
+        Result.succeed({
+          _tag: 'DateTime',
+          epochMs: Date.parse('2027-03-28T00:59:00Z'),
+        }),
+      );
+      expect(parsePointInDay('2027-03-28T03:00', now)).toEqual(
+        Result.succeed({
+          _tag: 'DateTime',
+          epochMs: Date.parse('2027-03-28T01:00:00Z'),
+        }),
+      );
+    });
   });
 });
 
