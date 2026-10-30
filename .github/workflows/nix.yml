@@ -1,0 +1,39 @@
+name: Nix
+
+# Builds the Nix package that other flakes consume as
+# `packages.<system>.default`. It also runs on draft pull requests, so a stale
+# dependency hash shows up before review. It isn't a required check.
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+
+      - name: Build
+        run: nix build .#default -L
+
+      - name: Check the command and skills
+        run: |
+          set -euo pipefail
+          result/bin/sp --help
+          for skill in apps/cli/skills/*/; do
+            diff -r "$skill" "result/share/sp-cli/skills/$(basename "$skill")"
+          done
