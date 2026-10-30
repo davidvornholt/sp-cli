@@ -1,3 +1,4 @@
+import os from 'node:os';
 import process from 'node:process';
 import { Config, Effect, Layer, Option } from 'effect';
 import { Command, Flag } from 'effect/cli';
@@ -28,9 +29,10 @@ const apiLayer = (target: Parameters<typeof connectionLayer>[0]) =>
 export const runApi = <E, R>(effect: Effect.Effect<unknown, E, R>) =>
   Effect.gen(function* () {
     const { host: selectedHost } = yield* root;
+    const { platform } = process;
     const target = Option.match(selectedHost, {
-      onNone: () => ({ _tag: 'Local' as const, platform: process.platform }),
-      onSome: (name) => ({ _tag: 'Ssh' as const, host: name }),
+      onNone: () => ({ _tag: 'Local' as const, platform, home: os.homedir() }),
+      onSome: (name) => ({ _tag: 'Ssh' as const, platform, host: name }),
     });
     const data = yield* effect.pipe(Effect.provide(apiLayer(target)));
     yield* emit(data);

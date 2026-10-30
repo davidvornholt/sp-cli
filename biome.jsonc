@@ -21,9 +21,11 @@
     {
       // CLI process boundary: the entrypoint and its output module write
       // stdout/stderr, detect a TTY, and set the exit code through
-      // node:process, and root passes the OS to the connection layer. App
-      // code otherwise must not import Node built-ins.
+      // node:process, and root passes the OS and home directory to the
+      // connection layer. The installer is operational tooling like the
+      // root scripts. App code otherwise must not import Node built-ins.
       "includes": [
+        "apps/cli/scripts/install.ts",
         "apps/cli/src/app/cli.ts",
         "apps/cli/src/app/output.ts",
         "apps/cli/src/app/root.ts"

@@ -1,10 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
-import { ConfigProvider, Effect } from 'effect';
-import { localTokenFile, remoteTokenCommand } from './connection';
+// biome-ignore lint/correctness/noNodejsModules: reads the OS to skip the POSIX shell tests on Windows
+import process from 'node:process';
+import { BunServices } from '@effect/platform-bun';
+import { ConfigProvider, Effect, Layer } from 'effect';
+import {
+  connectionLayer,
+  localTokenFile,
+  remoteTokenCommand,
+} from './connection';
 
-const resolve = (platform: NodeJS.Platform, env: string) =>
+const resolve = (platform: NodeJS.Platform, home: string, env = '') =>
   Effect.runPromise(
-    localTokenFile(platform).pipe(
+    localTokenFile(platform, home).pipe(
       Effect.provideService(
         ConfigProvider.ConfigProvider,
         ConfigProvider.fromDotEnvContents(env),
@@ -14,33 +21,50 @@ const resolve = (platform: NodeJS.Platform, env: string) =>
 
 describe('localTokenFile', () => {
   it('uses ~/.config on Linux', async () => {
-    expect(await resolve('linux', 'HOME=/home/me')).toBe(
+    expect(await resolve('linux', '/home/me')).toBe(
       '/home/me/.config/superProductivity/local-rest-api-token',
     );
   });
 
   it('honours XDG_CONFIG_HOME on Linux', async () => {
-    expect(await resolve('linux', 'HOME=/home/me\nXDG_CONFIG_HOME=/xdg')).toBe(
+    expect(await resolve('linux', '/home/me', 'XDG_CONFIG_HOME=/xdg')).toBe(
       '/xdg/superProductivity/local-rest-api-token',
     );
   });
 
   it('uses ~/Library/Application Support on macOS', async () => {
-    expect(
-      await resolve('darwin', 'HOME=/Users/me\nXDG_CONFIG_HOME=/xdg'),
-    ).toBe(
+    expect(await resolve('darwin', '/Users/me', 'XDG_CONFIG_HOME=/xdg')).toBe(
       '/Users/me/Library/Application Support/superProductivity/local-rest-api-token',
     );
   });
 
   it('uses APPDATA on Windows', async () => {
-    expect(await resolve('win32', 'APPDATA=C:/Users/me/AppData/Roaming')).toBe(
+    expect(
+      await resolve(
+        'win32',
+        'C:/Users/me',
+        'APPDATA=C:/Users/me/AppData/Roaming',
+      ),
+    ).toBe(
       'C:/Users/me/AppData/Roaming/superProductivity/local-rest-api-token',
     );
   });
 });
 
-describe('remoteTokenCommand', () => {
+describe('connectionLayer', () => {
+  it('refuses --host on Windows before starting ssh', async () => {
+    const error = await Effect.runPromise(
+      Layer.build(
+        connectionLayer({ _tag: 'Ssh', platform: 'win32', host: 'remote' }),
+      ).pipe(Effect.flip, Effect.scoped, Effect.provide(BunServices.layer)),
+    );
+    expect(error._tag).toBe('SshTunnelFailed');
+  });
+});
+
+// The command runs in a POSIX shell on the remote host, which Windows can't
+// stand in for, and sp refuses --host on Windows anyway.
+describe.skipIf(process.platform === 'win32')('remoteTokenCommand', () => {
   let home = '';
   const linuxFile = () =>
     `${home}/.config/superProductivity/local-rest-api-token`;
