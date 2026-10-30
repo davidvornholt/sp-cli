@@ -2,6 +2,8 @@ node_modules/
 .direnv/
 .turbo/
 dist/
+# The link that `nix build` leaves behind.
+result
 .next/
 *.log
 mise.local.toml
