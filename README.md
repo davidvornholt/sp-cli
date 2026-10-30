@@ -6,12 +6,14 @@
 
 ## Install
 
+Install [Bun](https://bun.sh), clone this repository, and run these commands in it on Linux, macOS, or Windows:
+
 ```bash
 bun install
-just install
+bun run --filter @sp-cli/cli install:user
 ```
 
-This builds a standalone binary to `~/.local/bin/sp` and installs the agent skill to `~/.agents/skills/super-productivity`, where Codex and Claude Code find it. Run it again after pulling changes.
+Where [just](https://just.systems) is installed, `just install` runs the second command. The installer builds a standalone binary to `~/.local/bin/sp` (`sp.exe` on Windows) and installs the agent skills to `~/.agents/skills`, where Codex and Claude Code find them. It says so when `~/.local/bin` isn't on your `PATH`. On Windows, add `%USERPROFILE%\.local\bin` to your user `Path` environment variable. Run the commands again after pulling changes.
 
 ## Configure
 
@@ -29,7 +31,7 @@ The API only listens on loopback, and the app rejects requests that don't look l
 sp --host david-x1-nixos tasks list --today --brief
 ```
 
-Set `SP_HOST` to make that the default. For each command, sp reads the token on the remote machine over SSH, from the Linux location or, if that file is missing, the macOS one. It then forwards a Unix socket in a private temporary directory to the remote `127.0.0.1:3876` and closes the tunnel when the command ends. This needs non-interactive SSH login (keys or Tailscale SSH) and nothing else on either machine.
+Set `SP_HOST` to make that the default. For each command, sp reads the token on the remote machine over SSH, from the Linux location or, if that file is missing, the macOS one. It then forwards a Unix socket in a private temporary directory to the remote `127.0.0.1:3876` and closes the tunnel when the command ends. This needs non-interactive SSH login (keys or Tailscale SSH) and nothing else on either machine. It doesn't work from Windows, because the OpenSSH client that ships with Windows can't forward a Unix socket.
 
 ## Use
 

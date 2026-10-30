@@ -36,9 +36,18 @@ export class Connection extends Context.Service<
   }
 >()('sp-cli/shared/Connection') {}
 
+// `platform` and `home` describe the machine sp runs on.
 export type ConnectionTarget =
-  | { readonly _tag: 'Local'; readonly platform: NodeJS.Platform }
-  | { readonly _tag: 'Ssh'; readonly host: string };
+  | {
+      readonly _tag: 'Local';
+      readonly platform: NodeJS.Platform;
+      readonly home: string;
+    }
+  | {
+      readonly _tag: 'Ssh';
+      readonly platform: NodeJS.Platform;
+      readonly host: string;
+    };
 
 const missingTokenMessage = (location: string, detail: string): string =>
   `Could not read the Super Productivity API token on ${location} (${detail}). Enable "Misc Settings > Enable local REST API (desktop only)" in the app, or set SP_TOKEN.`;
@@ -47,13 +56,12 @@ const envToken = Config.option(Config.NonEmptyString('SP_TOKEN'));
 
 // Where the app on this machine writes the API token, following Electron's
 // app.getPath('appData') for the given platform.
-export const localTokenFile = (platform: NodeJS.Platform) =>
+export const localTokenFile = (platform: NodeJS.Platform, home: string) =>
   Effect.gen(function* () {
     if (platform === 'win32') {
       const appData = yield* Config.NonEmptyString('APPDATA');
       return `${appData}/${tokenPath}`;
     }
-    const home = yield* Config.NonEmptyString('HOME');
     if (platform === 'darwin') {
       return `${home}/Library/Application Support/${tokenPath}`;
     }
@@ -63,14 +71,14 @@ export const localTokenFile = (platform: NodeJS.Platform) =>
     return `${Option.getOrElse(configHome, () => `${home}/.config`)}/${tokenPath}`;
   });
 
-const readLocalToken = (platform: NodeJS.Platform) =>
+const readLocalToken = (platform: NodeJS.Platform, home: string) =>
   Effect.gen(function* () {
     const fromEnv = yield* envToken;
     if (Option.isSome(fromEnv)) {
       return fromEnv.value;
     }
     const fs = yield* FileSystem.FileSystem;
-    const path = yield* localTokenFile(platform);
+    const path = yield* localTokenFile(platform, home);
     const token = yield* fs.readFileString(path).pipe(
       Effect.mapError(
         (error) =>
@@ -210,8 +218,11 @@ const openTunnel = Effect.fn('openTunnel')(function* (host: string) {
   return socket;
 });
 
-const local = Effect.fn('local')(function* (platform: NodeJS.Platform) {
-  const token = yield* readLocalToken(platform);
+const local = Effect.fn('local')(function* (
+  platform: NodeJS.Platform,
+  home: string,
+) {
+  const token = yield* readLocalToken(platform, home);
   return Connection.of({
     location: 'this machine',
     token,
@@ -219,7 +230,17 @@ const local = Effect.fn('local')(function* (platform: NodeJS.Platform) {
   });
 });
 
-const overSsh = Effect.fn('overSsh')(function* (host: string) {
+const overSsh = Effect.fn('overSsh')(function* (
+  platform: NodeJS.Platform,
+  host: string,
+) {
+  // The OpenSSH client that ships with Windows can't listen on a Unix socket.
+  if (platform === 'win32') {
+    return yield* new SshTunnelFailed({
+      message:
+        "--host doesn't work on Windows, because its OpenSSH client can't forward the Unix socket that sp tunnels through.",
+    });
+  }
   const [socket, token] = yield* Effect.all(
     [openTunnel(host), readRemoteToken(host)],
     {
@@ -249,5 +270,7 @@ export const connectionLayer = (
 > =>
   Layer.effect(
     Connection,
-    target._tag === 'Local' ? local(target.platform) : overSsh(target.host),
+    target._tag === 'Local'
+      ? local(target.platform, target.home)
+      : overSsh(target.platform, target.host),
   );
