@@ -14,7 +14,7 @@ Super Productivity is the user's planner. It holds only the future: the plan, de
 - Checking a task off with `update <id> --done` means it is out of the user's hands, not that it is done. When a thread takes over a planned task, check the task off as the thread starts. A night shift that takes a task also puts its thread link in the task's notes.
 - Never add a task for unplanned work, for an agent session, or to record finished work. Don't use the "Orchestrierung" tag.
 - When a thread leaves something only the user can do, such as renewing a key before it expires, add a task for it with `--deadline`. Keep deadlines on tasks; don't copy them into the calendar.
-- Don't track or log time unless the user explicitly asks, which they do only for work away from the computer, because time at the computer is measured elsewhere.
+- Don't track or log time unless the user explicitly asks, which they do only for work away from the computer, because time at the computer is measured elsewhere. Track it on a task tagged `off-computer` (or its subtask), because the daily report counts only that time. If the tag doesn't exist, ask the user to create it in the app.
 
 ## Commands
 
