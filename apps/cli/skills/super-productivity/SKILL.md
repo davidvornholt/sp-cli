@@ -1,20 +1,11 @@
 ---
 name: super-productivity
-description: Read and change the user's tasks, Today list, deadlines, repeating tasks, notes, time tracking, and simple counters (habits) in Super Productivity with the sp command. Use when the user asks about their tasks, to-dos, deadlines, notes, plans for a day, habits, or counters, or wants tasks added, changed, checked off, scheduled, repeated, or tracked, notes written, or a habit or counter updated. Also use when a thread takes over a planned task, or leaves something only the user can do.
+description: Read and change the user's tasks, Today list, deadlines, repeating tasks, notes, time tracking, and simple counters (habits) in Super Productivity with the sp command. Use when the user asks about their tasks, to-dos, deadlines, notes, plans for a day, habits, or counters, or wants tasks added, changed, checked off, scheduled, repeated, or tracked, notes written, or a habit or counter updated.
 ---
 
 # Super Productivity
 
 Run `sp --help` for commands and `sp <command> --help` for options. Output is JSON on stdout. Errors are JSON on stderr and exit 1, or 2 for invalid arguments.
-
-## What belongs in the app
-
-Super Productivity is the user's planner. It holds only the future: the plan, deadlines, and obligations only the user can fulfil. Work in progress and finished work live in T3 Code threads.
-
-- Checking a task off with `update <id> --done` means it is out of the user's hands, not that it is done. When a thread takes over a planned task, check the task off as the thread starts. A night shift that takes a task also puts its thread link in the task's notes.
-- Never add a task for unplanned work, for an agent session, or to record finished work. Don't use the "Orchestrierung" tag.
-- When a thread leaves something only the user can do, such as renewing a key before it expires, add a task for it with `--deadline`. Keep deadlines on tasks; don't copy them into the calendar.
-- Don't track or log time unless the user explicitly asks, which they do only for work away from the computer, because time at the computer is measured elsewhere. The daily report counts all time tracked in Super Productivity as time away from the computer.
 
 ## Commands
 
