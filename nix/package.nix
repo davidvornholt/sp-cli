@@ -38,7 +38,7 @@ let
     # A change to bun.lock or to the Bun version in package.json's
     # packageManager needs a new hash here. The failing build prints it after
     # "got:".
-    outputHash = "sha256-D6uQ5rEDaJhN9i/vWukE8O8GDEKTPnDgEX8+4Q1gMAU=";
+    outputHash = "sha256-GUmaRpeuPZqUhjB/zHNSPP8vHKSD7Q0OMJwxiiGoBnA=";
     outputHashAlgo = "sha256";
     outputHashMode = "recursive";
     impureEnvVars = lib.fetchers.proxyImpureEnvVars;
